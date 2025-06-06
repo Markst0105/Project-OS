@@ -1,0 +1,39 @@
+// src/App.js
+import React from 'react';
+// The import for BrowserRouter/Router has been removed. We only import what's needed.
+import { Routes, Route, Link } from 'react-router-dom';
+import Home from './pages/Home';
+import SystemCalls from './pages/SystemCalls';
+import Processes from './pages/Processes';
+import ProducerConsumer from './pages/ProducerConsumer';
+import MemoryManagement from './pages/MemoryManagement';
+import './App.css';
+
+function App() {
+  // The <Router> tags have been removed from around the div.
+  return (
+      <div>
+        <nav className="navbar">
+          <Link to="/" className="nav-brand">Sistemas Operacionais Interativos</Link>
+          <ul className="nav-links">
+            <li><Link to="/system-calls">Chamadas de Sistema</Link></li>
+            <li><Link to="/processes">Processos</Link></li>
+            <li><Link to="/producer-consumer">Produtor/Consumidor</Link></li>
+            <li><Link to="/memory-management">Gerência de Memória</Link></li>
+          </ul>
+        </nav>
+
+        <main className="container">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/system-calls" element={<SystemCalls />} />
+            <Route path="/processes" element={<Processes />} />
+            <Route path="/producer-consumer" element={<ProducerConsumer />} />
+            <Route path="/memory-management" element={<MemoryManagement />} />
+          </Routes>
+        </main>
+      </div>
+  );
+}
+
+export default App;

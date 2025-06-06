@@ -1,0 +1,31 @@
+/* src/pages/ProducerConsumer.css */
+.buffer-container {
+    display: flex;
+    gap: 10px;
+    border: 2px solid #34495e;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #ecf0f1;
+    margin-top: 1rem;
+}
+
+.buffer-slot {
+    width: 60px;
+    height: 60px;
+    border: 1px solid #7f8c8d;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 3px;
+}
+
+.buffer-slot.empty {
+    background-color: #dfe6e9;
+}
+
+.buffer-slot.full {
+    background-color: #2ecc71;
+    color: white;
+}

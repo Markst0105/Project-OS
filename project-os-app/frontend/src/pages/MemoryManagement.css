@@ -1,0 +1,32 @@
+/* src/pages/MemoryManagement.css */
+.memory-results { margin-top: 2rem; }
+.memory-step {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.fault { color: #e74c3c; font-weight: bold; }
+.hit { color: #27ae60; }
+.frames-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 0.5rem;
+}
+.frame {
+    flex: 1;
+    border: 1px solid #95a5a6;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    background-color: #ecf0f1;
+}
+.frame.highlight {
+    border-color: #3498db;
+    border-width: 2px;
+}
+.frame span {
+    display: block;
+    margin-top: 5px;
+    font-size: 1.2rem;
+}
