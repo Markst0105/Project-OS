@@ -11,7 +11,6 @@ import {
     Legend
 } from 'chart.js';
 
-
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 console.log("🧪 typeof Line:", typeof Line); // function
@@ -29,27 +28,17 @@ function Processes() {
             const data = await response.json();
 
             if (response.ok) {
-                // Ensure the response has the expected structure
                 setResults({
                     processType,
-                    realTime: data.realTime || 0,
-                    userTime: data.userTime || 0,
-                    sysTime: data.sysTime || 0,
+                    realTime: data.realTime || "N/A",
+                    userTime: data.userTime || "N/A",
+                    sysTime: data.sysTime || "N/A",
+                    cpuPercentage: data.cpuPercentage || "N/A",
+                    voluntarySwitches: data.voluntarySwitches || "N/A",
+                    involuntarySwitches: data.involuntarySwitches || "N/A",
                     timeline: data.timeline || [],
                     cpuUsage: data.cpuUsage || [],
                     explanation: data.explanation || 'No explanation provided'
-                    // processType,
-                    // realTime: data.realTime || 0,
-                    // userTime: data.userTime || 0,
-                    // sysTime: data.sysTime || 0,
-                    // cpuUsage: Array.isArray(data.cpuUsage)
-                    //     ? data.cpuUsage.map((v, i) => (typeof v === 'number' ? v : (console.warn(`⚠️ Invalid cpuUsage[${i}]:`, v), 0)))
-                    //     : [],
-                    //
-                    // timeline: Array.isArray(data.timeline)
-                    //     ? data.timeline.map((v, i) => (typeof v === 'string' || typeof v === 'number' ? String(v) : (console.warn(`⚠️ Invalid timeline[${i}]:`, v), `invalid-${i}`)))
-                    //     : [],
-                    // explanation: data.explanation || 'No explanation provided'
                 });
             } else {
                 setResults({
@@ -132,11 +121,26 @@ function Processes() {
                         <pre className="output-area error">{results.error}</pre>
                     ) : (
                         <>
-                            <p><strong>Total Time (real):</strong> {results.realTime}s</p>
-                            <p><strong>User CPU Time (user):</strong> {results.userTime}s</p>
-                            <p><strong>System/Kernel CPU Time (sys):</strong> {results.sysTime}s</p>
+                            <div className="metrics-grid" style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(3, 1fr)',
+                                gap: '1rem',
+                                marginBottom: '1rem'
+                            }}>
+                                <div>
+                                    <p><strong>Total Time (real):</strong> {results.realTime}</p>
+                                    <p><strong>User CPU Time (user):</strong> {results.userTime}</p>
+                                    <p><strong>System/Kernel CPU Time (sys):</strong> {results.sysTime}</p>
+                                </div>
+                                <div>
+                                    <p><strong>CPU Percentage:</strong> {results.cpuPercentage}%</p>
+                                    <p><strong>Voluntary Context Switches:</strong> {results.voluntarySwitches}</p>
+                                    <p><strong>Involuntary Context Switches:</strong> {results.involuntarySwitches}</p>
+                                </div>
+                            </div>
+
                             <h4>Explanation</h4>
-                            <div>
+                            <div style={{ whiteSpace: 'pre-line' }}>
                                 {typeof results.explanation === 'string'
                                     ? results.explanation
                                     : JSON.stringify(results.explanation)}
@@ -155,39 +159,6 @@ function Processes() {
                     )}
                 </div>
             )}
-
-            {/*{results && (*/}
-            {/*    <div className="results-container" style={{marginTop: '2rem'}}>*/}
-            {/*        <h3>Execution Results</h3>*/}
-            {/*        {results.error ? (*/}
-            {/*            <pre className="output-area error">{results.error}</pre>*/}
-            {/*        ) : (*/}
-            {/*            <>*/}
-            {/*                <p><strong>Total Time (real):</strong> {results.realTime}s</p>*/}
-            {/*                <p><strong>User CPU Time (user):</strong> {results.userTime}s</p>*/}
-            {/*                <p><strong>System/Kernel CPU Time (sys):</strong> {results.sysTime}s</p>*/}
-            {/*                <h4>Explanation</h4>*/}
-            {/*                <div>*/}
-            {/*                    {typeof results.explanation === 'string'*/}
-            {/*                        ? results.explanation*/}
-            {/*                        : JSON.stringify(results.explanation)}*/}
-            {/*                </div>*/}
-            {/*                {results.cpuUsage && results.cpuUsage.length > 0 && (*/}
-            {/*                    <div style={{ position: 'relative', height: '40vh', marginTop: '2rem' }}>*/}
-            {/*                        {(() => {*/}
-            {/*                            try {*/}
-            {/*                                return <Line options={chartOptions} data={chartData} />;*/}
-            {/*                            } catch (err) {*/}
-            {/*                                console.error("❌ Chart rendering failed:", err);*/}
-            {/*                                return <pre>Chart failed to render. See console for details.</pre>;*/}
-            {/*                            }*/}
-            {/*                        })()}*/}
-            {/*                    </div>*/}
-            {/*                )}*/}
-            {/*            </>*/}
-            {/*        )}*/}
-            {/*    </div>*/}
-            {/*)}*/}
         </div>
     );
 }

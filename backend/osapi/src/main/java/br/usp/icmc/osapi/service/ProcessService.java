@@ -93,7 +93,8 @@ public class ProcessService {
             return new ProcessMetricsResponse(
                     "cpu", realTime, userTime, sysTime,
                     cpuPercentage, voluntarySwitches, involuntarySwitches,
-                    "A high 'Percent of CPU' and a high number of 'Involuntary context switches' (the OS forcing the process to yield the CPU) are characteristic of a CPU-bound process.",
+                    "A high 'Percent of CPU' and a high number of 'Involuntary context switches' (the OS forcing the process to yield the CPU) are characteristic of a CPU-bound process.\n" +
+                            "The CPU-bound process spent most of its time in 'user' mode (userTime), performing calculations. The high 'user' time compared to 'real' time indicates high CPU saturation.",
                     List.of(85.0, 93.0, 95.0, 92.0, 96.0, 94.0, 95.0),
                     List.of("1s", "2s", "3s", "4s", "5s", "6s", "7s")
             );
@@ -101,7 +102,8 @@ public class ProcessService {
             return new ProcessMetricsResponse(
                     "io", realTime, userTime, sysTime,
                     cpuPercentage, voluntarySwitches, involuntarySwitches,
-                    "A low 'Percent of CPU' and a high number of 'Voluntary context switches' (the process giving up the CPU to wait for I/O) are characteristic of an I/O-bound process.",
+                    "A low 'Percent of CPU' and a high number of 'Voluntary context switches' (the process giving up the CPU to wait for I/O) are characteristic of an I/O-bound process.\n" +
+                            "The I/O-bound process has a large 'real' time but very low 'user' and 'sys' time. This means the process spent most of its time waiting for I/O operations (like reading/writing files), not using the CPU.",
                     List.of(5.0, 15.0, 4.0, 12.0, 6.0, 14.0, 5.0),
                     List.of("1s", "2s", "3s", "4s", "5s", "6s", "7s")
             );
