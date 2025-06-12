@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './ProducerConsumer.css';
+import FeedbackSection from "../components/FeedbackSection";
 
 function ProducerConsumer() {
     // Config state
@@ -101,6 +102,7 @@ function ProducerConsumer() {
                     ))}
                 </div>
             </div>
+            <FeedbackSection moduleName="producer-consumer"/>
         </div>
     );
 }

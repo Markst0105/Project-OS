@@ -1,6 +1,7 @@
 // frontend/src/pages/MemoryManagement.js
 import React, { useState } from 'react';
 import './MemoryManagement.css';
+import FeedbackSection from "../components/FeedbackSection";
 
 function MemoryManagement() {
     // Form inputs
@@ -107,6 +108,7 @@ function MemoryManagement() {
                     </div>
                 </div>
             )}
+            <FeedbackSection moduleName="memory-management"/>
         </div>
     );
 }

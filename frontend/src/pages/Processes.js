@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Line } from 'react-chartjs-2';
+import FeedbackSection from "../components/FeedbackSection";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -159,6 +160,7 @@ function Processes() {
                     )}
                 </div>
             )}
+            <FeedbackSection moduleName="processes"/>
         </div>
     );
 }

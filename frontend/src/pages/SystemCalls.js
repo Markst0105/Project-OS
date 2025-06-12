@@ -1,6 +1,11 @@
+// src/pages/SystemCalls.js
 import React, { useState } from 'react';
+// CORRECT: We import the component we want to use.
+import FeedbackSection from '../components/FeedbackSection';
 
-// Um mapa com os códigos de exemplo que você forneceu
+// This is the code for the *page*.
+// The incorrect, pasted function has been removed.
+
 const codeExamples = {
     'file-io': `// system-call-file.c
 #include <stdio.h>
@@ -71,19 +76,17 @@ function SystemCalls() {
         setCode(codeExamples[key]);
     };
 
-    // Esta função irá chamar o seu backend
     const handleExecute = async () => {
         setIsLoading(true);
         setOutput('');
 
         try {
-            // A URL do seu endpoint no backend (ex: Java/Spring Boot)
             const response = await fetch('http://localhost:8080/api/execute-c', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ code: code }), // Envia o código como JSON
+                body: JSON.stringify({ code: code }),
             });
 
             const result = await response.json();
@@ -117,15 +120,17 @@ function SystemCalls() {
             </div>
 
             <div className="editor-container">
-        <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            spellCheck="false"
-        />
+                <textarea
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    spellCheck="false"
+                />
                 <pre className="output-area">
-          <code>{output || 'A saída do programa aparecerá aqui...'}</code>
-        </pre>
+                    <code>{output || 'A saída do programa aparecerá aqui...'}</code>
+                </pre>
             </div>
+            {/* CORRECT: Use the imported component as a JSX tag */}
+            <FeedbackSection moduleName="system-calls" />
         </div>
     );
 }
