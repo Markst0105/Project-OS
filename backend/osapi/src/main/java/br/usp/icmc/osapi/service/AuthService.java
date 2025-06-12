@@ -23,23 +23,23 @@ public class AuthService {
         User newUser = new User();
         newUser.setUsername(request.username());
         newUser.setPassword(request.password());
-        newUser.setRole("USER"); // <-- ADD THIS LINE to set default role
+        newUser.setRole("USER"); // Set the default role for new users
         User savedUser = userRepository.save(newUser);
 
-        // We will update the UserDto later to include the role
+        // Return the DTO with the role included
         return new UserDto(savedUser.getId(), savedUser.getUsername(), savedUser.getRole());
     }
 
     public UserDto login(AuthRequest request) {
         User user = userRepository.findByUsernameAndPassword(request.username(), request.password())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid username or password."));
+
+        // Return the DTO with the role included
         return new UserDto(user.getId(), user.getUsername(), user.getRole());
     }
 
+    // This placeholder is still needed for the FeedbackController's dependency
     public User getCurrentUser() {
-        // In a stateless, simple auth system, the backend doesn't know the current user.
-        // The user ID must be passed from the frontend with each request.
-        // This method is a placeholder. Real logic would come from a security context.
         return null;
     }
 }

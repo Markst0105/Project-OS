@@ -1,11 +1,10 @@
-// frontend/src/components/FeedbackSection.js
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom'; // Import Link
+import { Link } from 'react-router-dom';
 import './FeedbackSection.css';
 
 function FeedbackSection({ moduleName }) {
-    const { user, isAuthenticated } = useAuth(); // 'user' object now contains {id, username}
+    const { user, isAuthenticated } = useAuth(); // 'user' object now contains {id, username, role}
     const [feedbackList, setFeedbackList] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +36,6 @@ function FeedbackSection({ moduleName }) {
             const response = await fetch('http://localhost:8080/api/feedback', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // Include the moduleName and userId in the request body
                 body: JSON.stringify({ moduleName, content: newComment, userId: user.id }),
             });
             if (!response.ok) {
@@ -45,7 +43,7 @@ function FeedbackSection({ moduleName }) {
                 throw new Error(errorText || 'Failed to post comment.');
             }
             setNewComment('');
-            fetchFeedback(); // Refresh the list
+            fetchFeedback();
         } catch (err) {
             setError(err.message);
         } finally {
@@ -58,7 +56,6 @@ function FeedbackSection({ moduleName }) {
         setError('');
 
         try {
-            // Send the current user's ID as a query parameter for verification on the backend
             const response = await fetch(`http://localhost:8080/api/feedback/${feedbackId}?userId=${user.id}`, {
                 method: 'DELETE',
             });
@@ -66,7 +63,7 @@ function FeedbackSection({ moduleName }) {
                 const errorText = await response.text();
                 throw new Error(errorText || 'You do not have permission to delete this.');
             }
-            fetchFeedback(); // Refresh the list
+            fetchFeedback();
         } catch (err) {
             setError(err.message);
         }
@@ -99,7 +96,9 @@ function FeedbackSection({ moduleName }) {
                         <p className="feedback-content">{fb.content}</p>
                         <div className="feedback-meta">
                             <span>by <strong>{fb.username}</strong> on {new Date(fb.createdAt).toLocaleDateString()}</span>
-                            {isAuthenticated && user?.id === fb.userId && (
+                            {/* --- FIXED LOGIC --- */}
+                            {/* Show button if user is authenticated AND (is a moderator OR is the author of the comment) */}
+                            {isAuthenticated && (user?.role === 'MODERATOR' || user?.id === fb.userId) && (
                                 <button onClick={() => handleDelete(fb.id)} className="delete-btn">Delete</button>
                             )}
                         </div>
