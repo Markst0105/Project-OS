@@ -1,16 +1,22 @@
-// src/pages/MemoryManagement.js
+// frontend/src/pages/MemoryManagement.js
 import React, { useState } from 'react';
-import './MemoryManagement.css'; // CSS específico
+import './MemoryManagement.css';
 
 function MemoryManagement() {
-    const [algorithm, setAlgorithm] = useState('LRU');
+    // Form inputs
+    const [algorithm, setAlgorithm] = useState('FIFO');
     const [numFrames, setNumFrames] = useState(4);
-    const [refString, setRefString] = useState('1,2,3,4,1,2,5,1,2,3,4,5');
+    const [refString, setRefString] = useState('1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5');
+
+    // Simulation state
     const [simulationResult, setSimulationResult] = useState(null);
+    const [currentStep, setCurrentStep] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const handleSimulate = async () => {
         setIsLoading(true);
+        setError('');
         setSimulationResult(null);
         try {
             const response = await fetch('http://localhost:8080/api/memory/simulate', {
@@ -19,48 +25,86 @@ function MemoryManagement() {
                 body: JSON.stringify({ algorithm, numFrames, referenceString: refString }),
             });
             const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'An error occurred during simulation.');
+            }
             setSimulationResult(data);
-        } catch (error) {
-            setSimulationResult({ error: `Erro de conexão: ${error.message}` });
+            setCurrentStep(0);
+        } catch (err) {
+            setError(err.message);
         } finally {
             setIsLoading(false);
         }
     };
 
+    const step = simulationResult?.steps[currentStep];
+    const totalSteps = simulationResult?.steps.length || 0;
+
     return (
         <div>
             <h1>Módulo 4: Gerenciamento de Memória Virtual</h1>
-            <div className="control-panel">
-                <label>Algoritmo:
+            <div className="sim-controls">
+                <div className="input-group">
+                    <label>Algorithm:</label>
                     <select value={algorithm} onChange={e => setAlgorithm(e.target.value)}>
                         <option value="FIFO">FIFO</option>
                         <option value="LRU">LRU</option>
                     </select>
-                </label>
-                <label>Nº de Frames: <input type="number" value={numFrames} onChange={e => setNumFrames(Number(e.target.value))} min="1" /></label>
-                <label>Sequência de Referências: <input type="text" value={refString} onChange={e => setRefString(e.target.value)} style={{width: '300px'}}/></label>
-                <button onClick={handleSimulate} disabled={isLoading}>Simular</button>
+                </div>
+                <div className="input-group">
+                    <label>Number of Frames:</label>
+                    <input type="number" value={numFrames} min="1" onChange={e => setNumFrames(Number(e.target.value))} />
+                </div>
+                <div className="input-group full-width">
+                    <label>Reference String (comma or space separated):</label>
+                    <input type="text" value={refString} onChange={e => setRefString(e.target.value)} />
+                </div>
+                <button onClick={handleSimulate} disabled={isLoading}>
+                    {isLoading ? 'Simulating...' : 'Run Simulation'}
+                </button>
             </div>
 
-            {isLoading && <p>Simulando...</p>}
+            {error && <pre className="output-area error">{error}</pre>}
 
             {simulationResult && (
-                <div className="memory-results">
-                    <h3>Resultados da Simulação</h3>
-                    <h4>Total de Page Faults: {simulationResult.pageFaults}</h4>
-                    {simulationResult.steps.map((step, index) => (
-                        <div key={index} className="memory-step">
-                            <p><strong>Passo {index + 1}:</strong> Referência à página <strong>{step.pageReferenced}</strong> - <span className={step.isPageFault ? 'fault' : 'hit'}>{step.isPageFault ? 'Page Fault' : 'Hit'}</span></p>
-                            <div className="frames-container">
-                                {step.frames.map((frame, fIndex) => (
-                                    <div key={fIndex} className={`frame ${frame.pageNumber === step.pageReferenced ? 'highlight' : ''}`}>
-                                        <strong>Frame {fIndex}</strong>
-                                        <span>{frame.pageNumber !== null ? `Página ${frame.pageNumber}` : 'Vazio'}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
+                <div className="results-area">
+                    <h2>Simulation Results</h2>
+                    <div className="summary">
+                        <p><strong>Total Page Faults:</strong> {simulationResult.totalPageFaults}</p>
+                        <p><strong>Total Hits:</strong> {simulationResult.totalHits}</p>
+                        <p><strong>Hit Ratio:</strong> {((simulationResult.totalHits / totalSteps) * 100).toFixed(2)}%</p>
+                    </div>
+
+                    <div className="step-controls">
+                        <button onClick={() => setCurrentStep(s => Math.max(0, s - 1))} disabled={currentStep === 0}>Previous</button>
+                        <span>Step: {currentStep + 1} / {totalSteps}</span>
+                        <button onClick={() => setCurrentStep(s => Math.min(totalSteps - 1, s + 1))} disabled={currentStep >= totalSteps - 1}>Next</button>
+                    </div>
+
+                    <div className="step-info">
+                        <p>Referencing Page: <strong>{step.pageReferenced}</strong></p>
+                        <p>Status: <span className={step.isPageFault ? 'fault' : 'hit'}>{step.isPageFault ? 'Page Fault' : 'Hit'}</span></p>
+                        {step.isPageFault && step.pageToReplace != null && (
+                            <p>Action: Page <strong>{step.pageToReplace}</strong> was replaced by Page <strong>{step.pageReferenced}</strong>.</p>
+                        )}
+                        {step.isPageFault && step.pageToReplace == null && (
+                            <p>Action: Page <strong>{step.pageReferenced}</strong> was placed in an empty frame.</p>
+                        )}
+                    </div>
+
+                    <h3>Memory State</h3>
+                    <div className="memory-frames">
+                        {Array.from({ length: numFrames }).map((_, index) => {
+                            const pageInMemory = step.memoryFrames[index];
+                            const isJustLoaded = pageInMemory === step.pageReferenced && step.isPageFault;
+                            return (
+                                <div key={index} className={`frame ${isJustLoaded ? 'highlight' : ''}`}>
+                                    <div className="frame-index">Frame {index}</div>
+                                    <div className="frame-content">{pageInMemory !== undefined ? pageInMemory : 'Empty'}</div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             )}
         </div>
