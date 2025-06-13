@@ -20,7 +20,7 @@ function ProducerConsumer() {
     const ws = useRef(null);
 
     useEffect(() => {
-        ws.current = new WebSocket('ws://localhost:8080/ws/producer-consumer');
+        ws.current = new WebSocket('/ws/producer-consumer');
         ws.current.onopen = () => setIsConnected(true);
         ws.current.onclose = () => setIsConnected(false);
 

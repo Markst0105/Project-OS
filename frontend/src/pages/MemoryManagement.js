@@ -20,7 +20,7 @@ function MemoryManagement() {
         setError('');
         setSimulationResult(null);
         try {
-            const response = await fetch('http://localhost:8080/api/memory/simulate', {
+            const response = await fetch('/api/memory/simulate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ algorithm, numFrames, referenceString: refString }),

@@ -12,7 +12,7 @@ function FeedbackSection({ moduleName }) {
 
     const fetchFeedback = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/api/feedback/${moduleName}`);
+            const response = await fetch(`/api/feedback/${moduleName}`);
             const data = await response.json();
             if (response.ok) {
                 setFeedbackList(data);
@@ -33,7 +33,7 @@ function FeedbackSection({ moduleName }) {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:8080/api/feedback', {
+            const response = await fetch('/api/feedback', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ moduleName, content: newComment, userId: user.id }),
@@ -56,7 +56,7 @@ function FeedbackSection({ moduleName }) {
         setError('');
 
         try {
-            const response = await fetch(`http://localhost:8080/api/feedback/${feedbackId}?userId=${user.id}`, {
+            const response = await fetch(`/api/feedback/${feedbackId}?userId=${user.id}`, {
                 method: 'DELETE',
             });
             if (!response.ok) {

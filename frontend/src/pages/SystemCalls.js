@@ -81,7 +81,7 @@ function SystemCalls() {
         setOutput('');
 
         try {
-            const response = await fetch('http://localhost:8080/api/execute-c', {
+            const response = await fetch('/api/execute-c', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,15 +1,17 @@
-# Step 1: Start from a standard, well-known Ubuntu base image.
-FROM ubuntu:latest
-
-# Step 2: Update the package manager and install our required tools in one command.
-# - 'gcc' is the C compiler.
-# - 'time' is the performance measurement utility.
-# - '-y' flag accepts all installation prompts.
-# - '&& rm...' is a cleanup step to keep the image small.
-RUN apt-get update && apt-get install -y gcc time && rm -rf /var/lib/apt/lists/*
-
-# Step 3: Set the working directory inside the container.
+# Stage 1: Build the application with Maven
+FROM maven:3.9-eclipse-temurin-17-alpine as builder
 WORKDIR /app
+COPY osapi/pom.xml .
+RUN mvn dependency:go-offline
+COPY osapi/src ./src
+RUN mvn clean package -DskipTests
 
-# Step 4: A default placeholder command.
-CMD ["/bin/sh"]
+# Stage 2: Create the final, smaller image with only the JRE
+FROM openjdk:17-slim
+WORKDIR /app
+# Copy the executable JAR from the builder stage
+COPY --from=builder /app/target/*.jar app.jar
+# Expose the port the application runs on
+EXPOSE 8080
+# The command to run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]

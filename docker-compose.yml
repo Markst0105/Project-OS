@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:16-alpine
+    container_name: os-db
+    environment:
+      # Use the same credentials as before
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 4563473478348356835835846585857878575764
+      POSTGRES_DB: os_project_database2
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # --- START OF NEW HEALTHCHECK ---
+    # This check repeatedly asks the database if it's ready.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # --- END OF NEW HEALTHCHECK ---
+
+  backend:
+    build: ./backend
+    container_name: os-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/os_project_database2
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 4563473478348356835835846585857878575764
+    # --- UPDATED depends_on ---
+    # This now waits for the database service to be 'healthy', not just 'started'.
+    depends_on:
+      database:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: os-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
