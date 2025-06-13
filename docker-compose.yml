@@ -7,7 +7,7 @@ services:
     environment:
       # Use the same credentials as before
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 4563473478348356835835846585857878575764
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: os_project_database2
     ports:
       - "5432:5432"
@@ -30,7 +30,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/os_project_database2
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: 4563473478348356835835846585857878575764
+      SPRING_DATASOURCE_PASSWORD: password
     # --- UPDATED depends_on ---
     # This now waits for the database service to be 'healthy', not just 'started'.
     depends_on:
