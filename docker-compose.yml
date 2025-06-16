@@ -8,7 +8,7 @@ services:
       # Use the same credentials as before
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: os_project_database2
+      POSTGRES_DB: os_project_database12
     ports:
       - "5432:5432"
     volumes:
@@ -28,7 +28,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/os_project_database2
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/os_project_database12
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
     # --- UPDATED depends_on ---

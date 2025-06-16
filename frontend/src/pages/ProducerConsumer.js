@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './ProducerConsumer.css';
+import { Link } from 'react-router-dom';
 import FeedbackSection from "../components/FeedbackSection";
+import './ProducerConsumer.css';
 
 function ProducerConsumer() {
     // Config state
@@ -20,13 +21,29 @@ function ProducerConsumer() {
     const ws = useRef(null);
 
     useEffect(() => {
-        ws.current = new WebSocket('/ws/producer-consumer');
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const host = window.location.host;
+        const wsUrl = `${protocol}://${host}/ws/producer-consumer`;
+
+        ws.current = new WebSocket(wsUrl);
+
         ws.current.onopen = () => setIsConnected(true);
-        ws.current.onclose = () => setIsConnected(false);
+
+        // --- START OF FIX ---
+        ws.current.onclose = () => {
+            console.log('WebSocket disconnected');
+            setIsConnected(false);
+            // Correctly update the isRunning property inside the simulationState object
+            setSimulationState(prevState => ({ ...prevState, isRunning: false }));
+        };
+        // --- END OF FIX ---
+
+        ws.current.onerror = (err) => {
+            console.error("WebSocket Error:", err);
+        };
 
         ws.current.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            // Update the entire simulation state at once
             setSimulationState({
                 buffer: data.buffer || [],
                 producers: data.producers || [],
@@ -38,7 +55,7 @@ function ProducerConsumer() {
         return () => {
             if (ws.current) ws.current.close();
         };
-    }, []); // This effect should only run once
+    }, []);
 
     const handleStart = () => {
         if (ws.current?.readyState === WebSocket.OPEN) {
@@ -56,7 +73,6 @@ function ProducerConsumer() {
         }
     };
 
-    // Create a visual buffer array based on the current state and config size
     const visualBuffer = Array(bufferSize).fill({ state: 'empty' });
     simulationState.buffer.forEach((item, index) => {
         visualBuffer[index] = { state: 'full', item: item };
@@ -65,7 +81,7 @@ function ProducerConsumer() {
     return (
         <div>
             <h1>Módulo 3: Problema do Produtor-Consumidor</h1>
-            <p>Status: <span style={{color: isConnected ? 'green' : 'red'}}>{isConnected ? 'Connected' : 'Disconnected'}</span></p>
+            <p>Status: <span style={{color: isConnected ? 'green' : 'red', fontWeight: 'bold'}}>{isConnected ? 'Connected' : 'Disconnected'}</span></p>
 
             <div className="control-panel">
                 <label>Produtores: <input type="number" value={numProducers} onChange={e => setNumProducers(Number(e.target.value))} min="1" disabled={simulationState.isRunning} /></label>

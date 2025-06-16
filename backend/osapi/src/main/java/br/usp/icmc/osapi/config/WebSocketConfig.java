@@ -19,6 +19,11 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         // Expose our handler at the "/ws/producer-consumer" endpoint
         registry.addHandler(socketHandler, "/ws/producer-consumer")
-                .setAllowedOrigins("http://localhost:3000"); // Allow connections from our React app
+                // --- START OF FIX ---
+                // Change from .setAllowedOrigins(...) to .setAllowedOriginPatterns("*")
+                // This tells the WebSocket endpoint to accept connections from any origin,
+                // including your Andromeda server URL.
+                .setAllowedOriginPatterns("*");
+        // --- END OF FIX ---
     }
 }

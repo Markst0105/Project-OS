@@ -6,8 +6,8 @@ import FeedbackSection from "../components/FeedbackSection";
 function MemoryManagement() {
     // Form inputs
     const [algorithm, setAlgorithm] = useState('FIFO');
-    const [numFrames, setNumFrames] = useState(4);
-    const [refString, setRefString] = useState('1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5');
+    const [numFrames, setNumFrames] = useState(8);
+    const [refString, setRefString] = useState('1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5, 6, 1, 2, 7, 1, 2, 3, 8, 4, 5, 6, 7');
 
     // Simulation state
     const [simulationResult, setSimulationResult] = useState(null);
