@@ -108,7 +108,15 @@ body {
   background-color: #e74c3c;
   border-color: #e74c3c;
 }
-
 .app-container {
   min-height: calc(100vh - 210px); /* Adjust 210px based on your footer's height */
+}
+.code-block {
+  background-color: #2c3e50; /* Dark background */
+  color: #ecf0f1; /* Light text */
+  padding: 1rem;
+  border-radius: 5px;
+  overflow-x: auto; /* Allow horizontal scrolling for long lines */
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
 }

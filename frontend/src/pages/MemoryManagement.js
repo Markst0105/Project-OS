@@ -1,13 +1,13 @@
 // frontend/src/pages/MemoryManagement.js
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react'; // Import useMemo
 import './MemoryManagement.css';
 import FeedbackSection from "../components/FeedbackSection";
 
 function MemoryManagement() {
     // Form inputs
     const [algorithm, setAlgorithm] = useState('FIFO');
-    const [numFrames, setNumFrames] = useState(8);
-    const [refString, setRefString] = useState('1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5, 6, 1, 2, 7, 1, 2, 3, 8, 4, 5, 6, 7');
+    const [numFrames, setNumFrames] = useState(5);
+    const [refString, setRefString] = useState('1, 2, 3, 4, 5, 1, 2, 6, 5, 4, 3, 2, 1, 7, 6, 5, 4, 3, 2, 1, 8, 7, 6, 5');
 
     // Simulation state
     const [simulationResult, setSimulationResult] = useState(null);
@@ -37,6 +37,20 @@ function MemoryManagement() {
             setIsLoading(false);
         }
     };
+
+    // --- START OF NEW UI LOGIC ---
+    // useMemo will re-calculate these stats only when the current step changes.
+    const cumulativeStats = useMemo(() => {
+        if (!simulationResult) {
+            return { faults: 0, hits: 0 };
+        }
+        // Get all steps from the beginning up to the current one.
+        const stepsSoFar = simulationResult.steps.slice(0, currentStep + 1);
+        const faults = stepsSoFar.filter(s => s.isPageFault).length;
+        const hits = stepsSoFar.length - faults;
+        return { faults, hits };
+    }, [simulationResult, currentStep]);
+    // --- END OF NEW UI LOGIC ---
 
     const step = simulationResult?.steps[currentStep];
     const totalSteps = simulationResult?.steps.length || 0;
@@ -70,10 +84,11 @@ function MemoryManagement() {
             {simulationResult && (
                 <div className="results-area">
                     <h2>Simulation Results</h2>
+                    {/* --- UPDATED TO SHOW CUMULATIVE STATS --- */}
                     <div className="summary">
-                        <p><strong>Total Page Faults:</strong> {simulationResult.totalPageFaults}</p>
-                        <p><strong>Total Hits:</strong> {simulationResult.totalHits}</p>
-                        <p><strong>Hit Ratio:</strong> {((simulationResult.totalHits / totalSteps) * 100).toFixed(2)}%</p>
+                        <p><strong>Page Faults (so far):</strong> {cumulativeStats.faults}</p>
+                        <p><strong>Hits (so far):</strong> {cumulativeStats.hits}</p>
+                        <p><strong>Hit Ratio (so far):</strong> {((cumulativeStats.hits / (currentStep + 1)) * 100).toFixed(2)}%</p>
                     </div>
 
                     <div className="step-controls">
@@ -95,7 +110,8 @@ function MemoryManagement() {
 
                     <h3>Memory State</h3>
                     <div className="memory-frames">
-                        {Array.from({ length: numFrames }).map((_, index) => {
+                        {/* The logic for displaying frames is correct and doesn't need to change */}
+                        {Array.from({ length: simulationResult.numFrames }).map((_, index) => {
                             const pageInMemory = step.memoryFrames[index];
                             const isJustLoaded = pageInMemory === step.pageReferenced && step.isPageFault;
                             return (

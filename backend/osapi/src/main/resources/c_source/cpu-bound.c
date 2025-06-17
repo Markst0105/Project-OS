@@ -27,7 +27,7 @@ int main() {
     volatile double result = 0.0; //  uso de volatile para evitar otimizações do compilador
     char buffer[64];
 
-    for (long long i = 0; i < 1e8; i++) {
+    for (long long i = 0; i < 1e7; i++) {
         result += custom_sqrt(i); //  faz um calculo intensivo de CPU
     }
 

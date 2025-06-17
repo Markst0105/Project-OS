@@ -55,31 +55,37 @@ public class MemoryManagementService {
     private MemorySimulationResponse simulateLRU(List<Integer> pageReferences, int numFrames) {
         List<SimulationStep> steps = new ArrayList<>();
         int pageFaults = 0;
-        List<Integer> frames = new ArrayList<>();
-        // For LRU, we can use a list where the end is the most recently used.
-        List<Integer> lruTracker = new LinkedList<>();
+
+        // LinkedHashMap is perfect for LRU. The 'true' flag makes it order by access.
+        LinkedHashMap<Integer, Boolean> lruCache = new LinkedHashMap<>(numFrames, 0.75f, true) {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry<Integer, Boolean> eldest) {
+                // This method is called after a 'put'. If it returns true, the eldest entry is removed.
+                return size() > numFrames;
+            }
+        };
 
         for (int page : pageReferences) {
             boolean isFault = false;
             Integer replacedPage = null;
 
-            if (!frames.contains(page)) {
+            if (!lruCache.containsKey(page)) {
                 isFault = true;
                 pageFaults++;
-                if (frames.size() < numFrames) {
-                    frames.add(page);
-                } else {
-                    replacedPage = lruTracker.remove(0); // Remove the least recently used (at the front)
-                    int frameIndex = frames.indexOf(replacedPage);
-                    frames.set(frameIndex, page);
+                // If the cache is full, we need to know which page is about to be removed.
+                if (lruCache.size() == numFrames) {
+                    // The eldest entry is the first one in the iterator.
+                    replacedPage = lruCache.keySet().iterator().next();
                 }
             }
-            // Move the currently accessed page to the end of the tracker (most recently used)
-            lruTracker.remove(Integer.valueOf(page));
-            lruTracker.add(page);
 
-            steps.add(new SimulationStep(page, new ArrayList<>(frames), isFault, replacedPage));
+            // Putting the page in (or accessing it) makes it the most recently used.
+            lruCache.put(page, true);
+
+            // The keyset of an access-ordered LinkedHashMap is the correct state of the frames.
+            steps.add(new SimulationStep(page, new ArrayList<>(lruCache.keySet()), isFault, replacedPage));
         }
+
         return new MemorySimulationResponse(steps, pageFaults, pageReferences.size() - pageFaults, "LRU", numFrames);
     }
 }
